@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 
 type AnalysisResult = {
+  video_id: number;
   topic: string;
   target_audience: string;
   viral_score: number;
@@ -14,6 +15,12 @@ type AnalysisResult = {
   improved_captions: string[];
   transcript: string;
   video_filename: string;
+};
+
+type UploadResult = {
+  video_id: number;
+  filename: string;
+  filepath: string;
 };
 
 type Status = "idle" | "uploading" | "analyzing";
@@ -77,6 +84,7 @@ function InsightList({ title, items }: { title: string; items: string[] }) {
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [uploadedVideoId, setUploadedVideoId] = useState<number | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,7 +106,10 @@ export default function Home() {
 
       if (!res.ok) throw new Error("Upload failed");
 
-      setMessage(`${file.name} uploaded`);
+      const data = (await res.json()) as UploadResult;
+      setUploadedVideoId(data.video_id);
+      setResult(null);
+      setMessage(`${data.filename} uploaded`);
     } catch {
       setMessage("Upload failed. Check that the API is running.");
     } finally {
@@ -107,13 +118,21 @@ export default function Home() {
   }
 
   async function handleAnalyze() {
+    if (uploadedVideoId === null) {
+      setMessage("Upload a video before analyzing.");
+      return;
+    }
+
     setStatus("analyzing");
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:8000/analyze", {
-        method: "POST",
-      });
+      const res = await fetch(
+        `http://localhost:8000/analyze/${uploadedVideoId}`,
+        {
+          method: "POST",
+        },
+      );
 
       if (!res.ok) throw new Error("Analysis failed");
 
@@ -150,6 +169,7 @@ export default function Home() {
               className="hidden"
               onChange={(event) => {
                 setFile(event.target.files?.[0] ?? null);
+                setUploadedVideoId(null);
                 setMessage("");
               }}
             />
@@ -171,7 +191,7 @@ export default function Home() {
 
             <button
               onClick={handleAnalyze}
-              disabled={busy}
+              disabled={uploadedVideoId === null || busy}
               className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {status === "analyzing" ? "Analyzing..." : "Analyze"}
@@ -189,7 +209,9 @@ export default function Home() {
           <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
             <section className="flex flex-col gap-6">
               <div className="rounded-lg border border-white/10 bg-zinc-900 p-5">
-                <p className="text-sm text-zinc-400">{result.video_filename}</p>
+                <p className="text-sm text-zinc-400">
+                  #{result.video_id} - {result.video_filename}
+                </p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">
                   {result.topic}
                 </h2>

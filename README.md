@@ -50,6 +50,7 @@ Frontend (Next.js)
 Backend API (FastAPI)
         │
         ├── Video Upload Processing
+        ├── PostgreSQL Video Records
         ├── Groq Whisper Transcription
         └── Llama 3.3 Analysis
                 │
@@ -73,6 +74,8 @@ Backend API (FastAPI)
 * FastAPI
 * Python
 * Pydantic
+* PostgreSQL
+* SQLAlchemy
 
 ### AI & Machine Learning
 
@@ -130,10 +133,17 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Create the local PostgreSQL database:
+
+```bash
+createdb creatoros
+```
+
 Create a `.env` file:
 
 ```env
 GROQ_API_KEY=your_api_key_here
+DATABASE_URL=postgresql+psycopg://localhost:5432/creatoros
 ```
 
 Run FastAPI:
@@ -170,7 +180,6 @@ http://localhost:3000
 
 ### Planned Features
 
-* PostgreSQL integration
 * User authentication
 * Historical video analytics
 * Dashboard for creator insights
@@ -201,4 +210,3 @@ Andy Minh Truong
 Recent Graduate from UC San Diego
 
 Interested in Software Engineering, AI Engineering, Machine Learning, and Full-Stack Development.
-
