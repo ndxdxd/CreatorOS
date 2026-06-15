@@ -78,16 +78,28 @@ async def analyze():
             {
                 "role": "user",
                 "content": f"""
-                    Analyze this video transcript and return JSON with exactly these fields:
-                    1. topic
-                    2. audience
-                    3. hook_strength (1-10)
-                    4. hook_ideas (list of 3)
-                    5. caption
+Analyze this video transcript as a short-form content strategist and content creator coach.
 
-                    Return only valid JSON, no markdown, no backticks.
+Return ONLY valid JSON with exactly these fields:
 
-                    Transcript: {transcript}
+{{
+    "topic": "string",
+    "target_audience": "string",
+    "viral_score": 0-100,
+    "hook_score": 0-10,
+    "retention_score": 0-10,
+    "strengths": ["string", "string", "string"],
+    "weaknesses": ["string", "string", "string"],
+    "improved_hooks": ["string", "string", "string"],
+    "improved_captions": ["string", "string", "string"]
+}}
+
+Do not return markdown.
+Do not return explanations.
+Return only valid JSON.
+
+Transcript:
+{transcript}
                 """
             }
         ]
