@@ -10,6 +10,7 @@ The goal of CreatorOS is to act as an intelligent content coach, helping creator
 
 * Upload short-form video content
 * Automatic speech-to-text transcription using Groq Whisper
+* Visual frame analysis using Groq vision models
 * AI-powered content analysis using Llama 3.3 70B
 * Viral potential scoring
 * Hook effectiveness evaluation
@@ -26,18 +27,24 @@ The goal of CreatorOS is to act as an intelligent content coach, helping creator
 1. User uploads a video
 2. Backend stores the uploaded file
 3. Groq Whisper generates a transcript
-4. Transcript is analyzed by Llama 3.3 70B
-5. CreatorOS generates:
+4. Representative video frames are analyzed by a Groq vision model
+5. Transcript and visual analysis are analyzed by Llama 3.3 70B
+6. CreatorOS generates:
 
    * Topic classification
    * Target audience identification
    * Viral potential score
    * Hook score
    * Retention score
+   * Visual hook score
+   * Pacing score
+   * Production quality score
    * Content strengths
    * Content weaknesses
+   * Visual strengths and weaknesses
    * Improved hook suggestions
    * Improved caption suggestions
+   * Editing suggestions
 
 ---
 
@@ -52,6 +59,7 @@ Backend API (FastAPI)
         ├── Video Upload Processing
         ├── PostgreSQL Video Records
         ├── Groq Whisper Transcription
+        ├── Groq Vision Frame Analysis
         └── Llama 3.3 Analysis
                 │
                 ▼
@@ -81,6 +89,7 @@ Backend API (FastAPI)
 
 * Groq API
 * Whisper Large V3
+* Llama 4 Scout Vision
 * Llama 3.3 70B Versatile
 
 ### Development Tools

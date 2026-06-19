@@ -13,6 +13,14 @@ type AnalysisResult = {
   weaknesses: string[];
   improved_hooks: string[];
   improved_captions: string[];
+  visual_summary: string;
+  visual_hook_score: number;
+  pacing_score: number;
+  production_quality_score: number;
+  on_screen_text: string[];
+  visual_strengths: string[];
+  visual_weaknesses: string[];
+  editing_suggestions: string[];
   transcript: string;
   video_filename: string;
 };
@@ -239,11 +247,53 @@ export default function Home() {
                 />
               </div>
 
+              <div className="grid gap-4 sm:grid-cols-3">
+                <MetricCard
+                  label="Visual Hook"
+                  value={result.visual_hook_score}
+                  max={10}
+                />
+                <MetricCard
+                  label="Pacing"
+                  value={result.pacing_score}
+                  max={10}
+                />
+                <MetricCard
+                  label="Production"
+                  value={result.production_quality_score}
+                  max={10}
+                />
+              </div>
+
+              <section className="rounded-lg border border-white/10 bg-zinc-900 p-5">
+                <h2 className="text-lg font-semibold text-white">
+                  Visual Summary
+                </h2>
+                <p className="mt-4 text-sm leading-7 text-zinc-300">
+                  {result.visual_summary}
+                </p>
+              </section>
+
               <div className="grid gap-6 md:grid-cols-2">
                 <InsightList title="Strengths" items={result.strengths} />
                 <InsightList title="Weaknesses" items={result.weaknesses} />
               </div>
 
+              <div className="grid gap-6 md:grid-cols-2">
+                <InsightList
+                  title="Visual Strengths"
+                  items={result.visual_strengths}
+                />
+                <InsightList
+                  title="Visual Weaknesses"
+                  items={result.visual_weaknesses}
+                />
+              </div>
+
+              <InsightList
+                title="On-screen Text"
+                items={result.on_screen_text}
+              />
               <InsightList
                 title="Improved Hooks"
                 items={result.improved_hooks}
@@ -251,6 +301,10 @@ export default function Home() {
               <InsightList
                 title="Improved Captions"
                 items={result.improved_captions}
+              />
+              <InsightList
+                title="Editing Suggestions"
+                items={result.editing_suggestions}
               />
             </section>
 
