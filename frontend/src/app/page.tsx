@@ -33,6 +33,15 @@ type UploadResult = {
 
 type Status = "idle" | "uploading" | "analyzing";
 
+const analysisStages = [
+  { percent: 12, label: "Preparing video" },
+  { percent: 28, label: "Transcribing audio" },
+  { percent: 46, label: "Sampling video frames" },
+  { percent: 66, label: "Analyzing visuals" },
+  { percent: 84, label: "Building creator report" },
+  { percent: 95, label: "Saving analysis" },
+];
+
 function scoreColor(score: number, max: number) {
   const percent = (score / max) * 100;
 
@@ -95,6 +104,8 @@ export default function Home() {
   const [uploadedVideoId, setUploadedVideoId] = useState<number | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [analysisStage, setAnalysisStage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleUpload() {
@@ -132,7 +143,15 @@ export default function Home() {
     }
 
     setStatus("analyzing");
+    setAnalysisProgress(analysisStages[0].percent);
+    setAnalysisStage(analysisStages[0].label);
     setMessage("");
+    let stageIndex = 0;
+    const progressTimer = window.setInterval(() => {
+      stageIndex = Math.min(stageIndex + 1, analysisStages.length - 1);
+      setAnalysisProgress(analysisStages[stageIndex].percent);
+      setAnalysisStage(analysisStages[stageIndex].label);
+    }, 3500);
 
     try {
       const res = await fetch(
@@ -145,12 +164,19 @@ export default function Home() {
       if (!res.ok) throw new Error("Analysis failed");
 
       const data = (await res.json()) as AnalysisResult;
+      setAnalysisProgress(100);
+      setAnalysisStage("Analysis complete");
       setResult(data);
       setMessage(`Analyzed ${data.video_filename}`);
     } catch {
       setMessage("Analysis failed. Upload a video and check your Groq key.");
     } finally {
+      window.clearInterval(progressTimer);
       setStatus("idle");
+      setTimeout(() => {
+        setAnalysisProgress(0);
+        setAnalysisStage("");
+      }, 900);
     }
   }
 
@@ -211,6 +237,29 @@ export default function Home() {
           <p className="rounded-lg border border-white/10 bg-zinc-900 px-4 py-3 text-sm text-zinc-300">
             {message}
           </p>
+        )}
+
+        {status === "analyzing" && (
+          <section className="rounded-lg border border-emerald-500/20 bg-zinc-900 p-5">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">
+                  Analyzing video
+                </h2>
+                <p className="mt-1 text-sm text-zinc-400">{analysisStage}</p>
+              </div>
+              <p className="text-2xl font-semibold text-emerald-400">
+                {analysisProgress}%
+              </p>
+            </div>
+
+            <div className="mt-5 h-3 overflow-hidden rounded-full bg-zinc-800">
+              <div
+                className="h-full rounded-full bg-emerald-500 transition-all duration-700 ease-out"
+                style={{ width: `${analysisProgress}%` }}
+              />
+            </div>
+          </section>
         )}
 
         {result ? (
