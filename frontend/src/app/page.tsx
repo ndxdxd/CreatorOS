@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 
 type AnalysisResult = {
@@ -196,6 +197,13 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <Link
+              href="/history"
+              className="rounded-lg border border-white/10 bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+            >
+              History
+            </Link>
+
             <input
               ref={inputRef}
               type="file"
